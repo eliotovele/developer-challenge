@@ -27,7 +27,7 @@ export default function Home() {
   }, []);
 
   const formattedCountries = countries?.filter(country => {
-    if (countryName === '') {
+    if (!countryName) {
       return country;
     } else if (
       country.name.official.toLowerCase().includes(countryName?.toLowerCase()!)
