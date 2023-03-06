@@ -5,26 +5,16 @@ import { getFormattedNumber } from '@/helpers/number';
 import { api } from '@/services/api';
 import { Country } from '@/types/country';
 import exportFromJSON from 'export-from-json';
+import { GetServerSideProps } from 'next';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
-export default function Home() {
-  const [countries, setCountries] = useState<Country[]>();
+type HomeProps = {
+  countries: Country[];
+};
+
+export default function Home({ countries }: HomeProps) {
   const [countryName, setCountryName] = useState<string>();
-
-  async function getCountries() {
-    try {
-      const response = await api.get<Country[]>('/all');
-
-      setCountries(response.data);
-    } catch (error) {
-      console.error(error);
-    }
-  }
-
-  useEffect(() => {
-    getCountries();
-  }, []);
 
   const formattedCountries = countries?.filter(country => {
     if (!countryName) {
@@ -141,6 +131,11 @@ export default function Home() {
                   ))}
                 </div>
               </div>
+              {!formattedCountries && (
+                <div className="flex justify-center items-center w-full h-full">
+                  A carregar dados...
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -148,3 +143,13 @@ export default function Home() {
     </Container>
   );
 }
+
+export const getServerSideProps: GetServerSideProps = async context => {
+  const response = await api.get<Country[]>('/all');
+
+  return {
+    props: {
+      countries: response.data,
+    },
+  };
+};
